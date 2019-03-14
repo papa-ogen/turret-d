@@ -9,10 +9,6 @@ export default class extends Phaser.Scene {
   preload () {
     this.fontsReady = false
     this.fontsLoaded = this.fontsLoaded.bind(this)
-    this.add.text(100, 100, 'loading fonts...')
-
-    this.load.image('loaderBg', './assets/images/loader-bg.png')
-    this.load.image('loaderBar', './assets/images/loader-bar.png')
 
     WebFont.load({
       google: {
@@ -20,6 +16,8 @@ export default class extends Phaser.Scene {
       },
       active: this.fontsLoaded
     })
+
+    this.load.image('logo', 'assets/images/ui/logo.png')
   }
 
   update () {

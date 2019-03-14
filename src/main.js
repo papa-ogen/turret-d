@@ -13,6 +13,7 @@ const gameConfig = Object.assign(config, {
 class Game extends Phaser.Game {
   constructor () {
     super(gameConfig)
+    this.scene.start('GameScene')
   }
 }
 
