@@ -78,7 +78,7 @@ export default class extends Phaser.Scene {
     })
 
     this.load.tilemapTiledJSON('level1', 'assets/level/level1.json')
-    this.load.spritesheet('terrainTiles_default', 'assets/images/mapPack_spritesheet.png', { frameWidth: 64, frameHeight: 64 })
+    this.load.spritesheet('mapPack_spritesheet', 'assets/images/mapPack_spritesheet.png', { frameWidth: 64, frameHeight: 64 })
   }
 
   create () {
