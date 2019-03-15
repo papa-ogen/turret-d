@@ -44,9 +44,9 @@ export default class extends Phaser.GameObjects.Image {
   }
 
   recieveDamage (damage) {
-    this.h -= damage
+    this.hp -= damage
 
-    if (this.hp < 0) {
+    if (this.hp <= 0) {
       this.setActive(false)
       this.setVisible(false)
     }

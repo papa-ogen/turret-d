@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import map from '../config/map'
 import Enemy from '../sprites/Enemy'
 import Turret from '../sprites/Turret'
+import Bullet from '../sprites/Bullet'
 
 export default class extends Phaser.Scene {
   constructor () {
@@ -23,7 +24,6 @@ export default class extends Phaser.Scene {
   }
 
   update (time, delta) {
-    console.log(time > this.nextEnemy)
     if (time > this.nextEnemy) {
       let enemy = this.enemies.getFirstDead()
 
@@ -36,9 +36,9 @@ export default class extends Phaser.Scene {
         enemy.setActive(true)
         enemy.setVisible(true)
         enemy.startOnPath()
-      }
 
-      this.nextEnemy = time + 2000
+        this.nextEnemy = time + 2000
+      }
     }
   }
 
@@ -94,16 +94,34 @@ export default class extends Phaser.Scene {
   createGroups () {
     this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true })
     this.turrets = this.add.group({ classType: Turret, runChildUpdate: true })
+    this.bullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true })
 
+    this.physics.add.overlap(this.enemies, this.bullets, this.damageEnemy.bind(this))
     this.input.on('pointerdown', this.placeTurret.bind(this))
   }
 
-  getEnemy () {
+  getEnemy (x, y, distance) {
+    const enemyUnits = this.enemies.getChildren()
+
+    for (let i = 0; i < enemyUnits.length; i++) {
+      const enemy = enemyUnits[i]
+      if (enemy.active && Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y) <= distance) {
+        return enemy
+      }
+    }
+
     return false
   }
 
-  addBullet () {
+  addBullet (x, y, angle, damage) {
+    let bullet = this.bullets.getFirstDead()
 
+    if (!bullet) {
+      bullet = new Bullet(this, 0, 0, damage)
+      this.bullets.add(bullet)
+    }
+
+    bullet.fire(x, y, angle)
   }
 
   placeTurret (pointer) {
@@ -121,6 +139,15 @@ export default class extends Phaser.Scene {
       turret.setActive(true)
       turret.setVisible(true)
       turret.place(i, j)
+    }
+  }
+
+  damageEnemy (enemy, bullet) {
+    if (enemy.active === true && bullet.active === true) {
+      bullet.setActive(false)
+      bullet.setVisible(false)
+
+      enemy.recieveDamage(bullet.damage)
     }
   }
 }
