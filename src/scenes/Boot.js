@@ -3,7 +3,7 @@ import WebFont from 'webfontloader'
 
 export default class extends Phaser.Scene {
   constructor () {
-    super({ key: 'BootScene' })
+    super({ key: 'Boot' })
   }
 
   preload () {
@@ -22,7 +22,7 @@ export default class extends Phaser.Scene {
 
   update () {
     if (this.fontsReady) {
-      this.scene.start('SplashScene')
+      this.scene.start('Splash')
     }
   }
 
