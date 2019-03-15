@@ -6,6 +6,11 @@ export default class extends Phaser.Scene {
   }
 
   preload () {
+    this.createPreloader()
+    this.loadAssets()
+  }
+
+  createPreloader () {
     const width = this.cameras.main.width
     const height = this.cameras.main.height
 
@@ -76,12 +81,18 @@ export default class extends Phaser.Scene {
       loadingText.destroy()
       percenText.destroy()
     })
+  }
 
+  loadAssets () {
+    this.load.image('title', 'assets/images/ui/title.png')
+    this.load.image('cursor', 'assets/images/ui/cursor.png')
+    this.load.image('blueButton1', 'assets/images/ui/blue_button02.png')
+    this.load.image('blueButton2', 'assets/images/ui/blue_button03.png')
     this.load.tilemapTiledJSON('level1', 'assets/level/level1.json')
     this.load.spritesheet('mapPack_spritesheet', 'assets/images/mapPack_spritesheet.png', { frameWidth: 64, frameHeight: 64 })
   }
 
   create () {
-    this.scene.start('Game')
+    this.scene.start('Title')
   }
 }
