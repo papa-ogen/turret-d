@@ -89,10 +89,11 @@ export default class extends Phaser.Scene {
     this.load.image('blueButton1', 'assets/images/ui/blue_button02.png')
     this.load.image('blueButton2', 'assets/images/ui/blue_button03.png')
     this.load.tilemapTiledJSON('level1', 'assets/level/level1.json')
+    this.load.image('base', 'assets/images/mapTile_095.png')
     this.load.spritesheet('mapPack_spritesheet', 'assets/images/mapPack_spritesheet.png', { frameWidth: 64, frameHeight: 64 })
   }
 
   create () {
-    this.scene.start('Title')
+    this.scene.start('Game')
   }
 }
