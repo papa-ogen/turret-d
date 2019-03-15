@@ -1,5 +1,7 @@
 import Phaser from 'phaser'
 import map from '../config/map'
+import Enemy from '../sprites/Enemy'
+import Turret from '../sprites/Turret'
 
 export default class extends Phaser.Scene {
   constructor () {
@@ -9,12 +11,35 @@ export default class extends Phaser.Scene {
     this.map = map.map((arr) => {
       return arr.slice()
     })
+
+    this.nextEnemy = 0
   }
 
   create () {
     this.createMap()
     this.createPath()
     this.createCursor()
+    this.createGroups()
+  }
+
+  update (time, delta) {
+    console.log(time > this.nextEnemy)
+    if (time > this.nextEnemy) {
+      let enemy = this.enemies.getFirstDead()
+
+      if (!enemy) {
+        enemy = new Enemy(this, 0, 0, this.path)
+        this.enemies.add(enemy)
+      }
+
+      if (enemy) {
+        enemy.setActive(true)
+        enemy.setVisible(true)
+        enemy.startOnPath()
+      }
+
+      this.nextEnemy = time + 2000
+    }
   }
 
   createMap () {
@@ -64,5 +89,38 @@ export default class extends Phaser.Scene {
 
   canPlaceTurret (i, j) {
     return this.map[i][j] === 0
+  }
+
+  createGroups () {
+    this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true })
+    this.turrets = this.add.group({ classType: Turret, runChildUpdate: true })
+
+    this.input.on('pointerdown', this.placeTurret.bind(this))
+  }
+
+  getEnemy () {
+    return false
+  }
+
+  addBullet () {
+
+  }
+
+  placeTurret (pointer) {
+    const i = Math.floor(pointer.y / 64)
+    const j = Math.floor(pointer.x / 64)
+
+    if (this.canPlaceTurret(i, j)) {
+      let turret = this.turrets.getFirstDead()
+
+      if (!turret) {
+        turret = new Turret(this, 0, 0, this.map)
+        this.turrets.add(turret)
+      }
+
+      turret.setActive(true)
+      turret.setVisible(true)
+      turret.place(i, j)
+    }
   }
 }
