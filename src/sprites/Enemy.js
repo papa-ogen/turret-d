@@ -14,9 +14,9 @@ export default class extends Phaser.GameObjects.Image {
     this.scene.add.existing(this)
   }
 
-  startOnPath () {
-    this.hp = levelConfig.initial.enemyHealth + levelConfig.incremental.enemyHealth
-    this.speed = levelConfig.initial.enemySpeed * levelConfig.incremental.enemySpeed
+  startOnPath (level) {
+    this.hp = levelConfig.initial.enemyHealth + level * levelConfig.incremental.enemyHealth
+    this.speed = levelConfig.initial.enemySpeed * levelConfig.incremental.enemySpeed * level
 
     this.follower.t = 0
     // get x and y of the given t point
@@ -51,6 +51,7 @@ export default class extends Phaser.GameObjects.Image {
       this.setActive(false)
       this.setVisible(false)
       this.scene.updateScore(10)
+      this.scene.updateEnemies(-1)
     }
   }
 }

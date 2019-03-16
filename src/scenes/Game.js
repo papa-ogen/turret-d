@@ -4,6 +4,8 @@ import Enemy from '../sprites/Enemy'
 import Turret from '../sprites/Turret'
 import Bullet from '../sprites/Bullet'
 
+import levelConfig from '../config/levelConfig'
+
 export default class extends Phaser.Scene {
   constructor () {
     super('Game')
@@ -13,22 +15,25 @@ export default class extends Phaser.Scene {
       return arr.slice()
     })
 
+    this.level = 1
     this.nextEnemy = 0
     this.score = 0
-    this.health = 2
-    this.availableTurrets = 2
+    this.health = levelConfig.initial.baseHealth
+    this.availableTurrets = levelConfig.initial.numOfTurrets
     this.roundStarted = false
+    this.remainingEnemies = levelConfig.initial.numOfEnemies + this.level * levelConfig.incremental.numOfEnemies
 
     this.events.emit('displayUI')
     this.events.emit('updateHealth', this.health)
     this.events.emit('updateScore', this.score)
     this.events.emit('updateTurrets', this.availableTurrets)
+    this.events.emit('updateEnemies', this.remainingEnemies)
 
     this.uiScene = this.scene.get('UI')
   }
 
   create () {
-    this.events.emit('startRound')
+    this.events.emit('startRound', this.level)
 
     this.uiScene.events.on('roundReady', () => {
       this.roundStarted = true
@@ -57,15 +62,28 @@ export default class extends Phaser.Scene {
     }
   }
 
-  updateTurrets () {
-    this.availableTurrets--
+  updateTurrets (numOfTurrets) {
+    this.availableTurrets += numOfTurrets
     this.events.emit('updateTurrets', this.availableTurrets)
+  }
+
+  updateEnemies (numOfEnemies) {
+    this.remainingEnemies += numOfEnemies
+    this.events.emit('updateEnemies', this.remainingEnemies)
+
+    if (this.remainingEnemies <= 0) {
+      this.increaseLevel()
+    }
   }
 
   update (time, delta) {
     this.createCameraControls()
 
-    if (time > this.nextEnemy && this.roundStarted) {
+    if (this.health <= 0) {
+      console.log('Game Over')
+    }
+
+    if (time > this.nextEnemy && this.roundStarted && this.enemies.countActive(true) < this.remainingEnemies) {
       let enemy = this.enemies.getFirstDead()
 
       if (!enemy) {
@@ -76,7 +94,7 @@ export default class extends Phaser.Scene {
       if (enemy) {
         enemy.setActive(true)
         enemy.setVisible(true)
-        enemy.startOnPath()
+        enemy.startOnPath(this.level)
 
         this.nextEnemy = time + 2000
       }
@@ -218,7 +236,7 @@ export default class extends Phaser.Scene {
       turret.setActive(true)
       turret.setVisible(true)
       turret.place(i, j)
-      this.updateTurrets()
+      this.updateTurrets(-1)
     }
   }
 
@@ -235,5 +253,14 @@ export default class extends Phaser.Scene {
         enemy.tint = 0xffffff
       })
     }
+  }
+
+  increaseLevel () {
+    this.roundStarted = false
+    this.level++
+    this.updateTurrets(levelConfig.incremental.numOfTurrets)
+    this.updateEnemies(levelConfig.initial.numOfEnemies + this.level * levelConfig.incremental.numOfEnemies)
+
+    this.events.emit('startRound', this.level)
   }
 }

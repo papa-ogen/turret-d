@@ -8,7 +8,7 @@ export default class extends Phaser.GameObjects.Image {
     this.map = map
     this.nextTic = 0
     this.range = 200
-    this.damage = 10
+    this.damage = 50
     this.fireRate = 1000
     this.scene.add.existing(this)
   }
