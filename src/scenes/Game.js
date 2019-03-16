@@ -14,9 +14,25 @@ export default class extends Phaser.Scene {
     })
 
     this.nextEnemy = 0
+    this.score = 0
+    this.health = 2
+    this.availableTurrets = 2
+    this.roundStarted = false
+
+    this.events.emit('displayUI')
+    this.events.emit('updateHealth', this.health)
+    this.events.emit('updateScore', this.score)
+    this.events.emit('updateTurrets', this.availableTurrets)
+
+    this.uiScene = this.scene.get('UI')
   }
 
   create () {
+    this.events.emit('startRound')
+
+    this.uiScene.events.on('roundReady', () => {
+      this.roundStarted = true
+    })
     this.createMap()
     this.createPath()
     this.createCursor()
@@ -26,10 +42,30 @@ export default class extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, 1024, 2048)
   }
 
+  updateScore (score) {
+    this.score += score
+    this.events.emit('updateScore', this.score)
+  }
+
+  updateHealth (health) {
+    this.health -= health
+    this.events.emit('updateHealth', this.health)
+
+    if (this.health <= 0) {
+      this.events.emit('hideUI')
+      this.scene.start('Title')
+    }
+  }
+
+  updateTurrets () {
+    this.availableTurrets--
+    this.events.emit('updateTurrets', this.availableTurrets)
+  }
+
   update (time, delta) {
     this.createCameraControls()
 
-    if (time > this.nextEnemy) {
+    if (time > this.nextEnemy && this.roundStarted) {
       let enemy = this.enemies.getFirstDead()
 
       if (!enemy) {
@@ -57,8 +93,9 @@ export default class extends Phaser.Scene {
     this.backgroundLayer = this.bgMap.createStaticLayer('Ground', this.tiles, 0, 0)
     this.roadLayer = this.bgMap.createStaticLayer('Road', this.tiles, 0, 0)
     this.detailsLayer = this.bgMap.createStaticLayer('Details', this.tiles, 0, 0)
-    // add tower
-    this.add.image(222, 680, 'base')
+    // add base
+    const base = this.add.image(222, 680, 'base')
+    base.depth = 1
   }
 
   createPath () {
@@ -68,7 +105,7 @@ export default class extends Phaser.Scene {
     this.path.lineTo(416, 224)
     this.path.lineTo(416, 480)
     this.path.lineTo(225, 480)
-    this.path.lineTo(225, 720)
+    this.path.lineTo(225, 690)
 
     this.graphics.lineStyle(3, 0xffffff, 1)
     this.path.draw(this.graphics)
@@ -93,7 +130,7 @@ export default class extends Phaser.Scene {
   }
 
   canPlaceTurret (i, j) {
-    return this.map[i][j] === 0
+    return this.map[i][j] === 0 && this.availableTurrets > 0
   }
 
   createGroups () {
@@ -181,6 +218,7 @@ export default class extends Phaser.Scene {
       turret.setActive(true)
       turret.setVisible(true)
       turret.place(i, j)
+      this.updateTurrets()
     }
   }
 

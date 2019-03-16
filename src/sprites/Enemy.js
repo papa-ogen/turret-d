@@ -40,6 +40,7 @@ export default class extends Phaser.GameObjects.Image {
     if (this.follower.t >= 1) {
       this.setActive(false)
       this.setVisible(false)
+      this.scene.updateHealth(1)
     }
   }
 
@@ -49,6 +50,7 @@ export default class extends Phaser.GameObjects.Image {
     if (this.hp <= 0) {
       this.setActive(false)
       this.setVisible(false)
+      this.scene.updateScore(10)
     }
   }
 }
