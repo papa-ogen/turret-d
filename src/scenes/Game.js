@@ -21,9 +21,14 @@ export default class extends Phaser.Scene {
     this.createPath()
     this.createCursor()
     this.createGroups()
+
+    this.cursors = this.input.keyboard.createCursorKeys()
+    this.cameras.main.setBounds(0, 0, 1024, 2048)
   }
 
   update (time, delta) {
+    this.createCameraControls()
+
     if (time > this.nextEnemy) {
       let enemy = this.enemies.getFirstDead()
 
@@ -100,6 +105,43 @@ export default class extends Phaser.Scene {
     this.input.on('pointerdown', this.placeTurret.bind(this))
   }
 
+  createCameraControls () {
+    if (this.cursors.up.isDown) {
+      this.cameras.main.y -= 4
+    } else if (this.cursors.down.isDown) {
+      this.cameras.main.y += 4
+    }
+
+    if (this.cursors.left.isDown) {
+      this.cameras.main.x -= 4
+    } else if (this.cursors.right.isDown) {
+      this.cameras.main.x += 4
+    }
+  }
+
+  createExplosion () {
+    // var config1 = {
+    //   key: 'explosion',
+    //   frames: this.anims.generateFrameNumbers('boom1', { start: 0, end: 23, first: 23 }),
+    //   frameRate: 20,
+    //   repeat: -1
+    // }
+
+    // this.anims.create(config1)
+
+    // this.add.sprite(300, 200).play('explosion')
+
+    // this.textures.addSpriteSheetFromAtlas(
+    //   'boom2',
+    //   {
+    //     atlas: 'allSprites_default',
+    //     frame: 'explosion1.png',
+    //     frameWidth: 64,
+    //     frameHeight: 64,
+    //     endFrame: 4
+    //   })
+  }
+
   getEnemy (x, y, distance) {
     const enemyUnits = this.enemies.getChildren()
 
@@ -148,6 +190,12 @@ export default class extends Phaser.Scene {
       bullet.setVisible(false)
 
       enemy.recieveDamage(bullet.damage)
+
+      enemy.tint = 0xff0000
+
+      this.time.delayedCall(500, () => {
+        enemy.tint = 0xffffff
+      })
     }
   }
 }

@@ -93,6 +93,7 @@ export default class extends Phaser.Scene {
     this.load.image('enemy', 'assets/images/tank_dark.png')
     this.load.image('turret', 'assets/images/tank_red.png')
     this.load.spritesheet('mapPack_spritesheet', 'assets/images/mapPack_spritesheet.png', { frameWidth: 64, frameHeight: 64 })
+    this.load.atlasXML('allSprites_default', 'assets/images/allSprites_default.png', 'assets/images/allSprites_default.xml')
   }
 
   create () {
